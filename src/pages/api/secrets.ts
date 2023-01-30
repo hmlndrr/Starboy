@@ -33,13 +33,11 @@ export default async function handler(
   }
 
   try {
-    console.log(process.env);
-    console.log(
-      await fetch("/secrets/starboy_secrets.yml").then((res) => res.text())
-    );
-
+    const url = process.env.ME || "http://localhost:3000";
     const secret = yml.load(
-      await fetch("/secrets/starboy_secrets.yml").then((res) => res.text())
+      await fetch(`${url}/secrets/starboy_secrets.yml`).then((res) =>
+        res.text()
+      )
     ) as Config;
 
     if (!secret) {
@@ -58,12 +56,12 @@ export default async function handler(
       return;
     }
 
-    const flag = process.env.FLAG || "NO FLAG, CONTACT ADMIN";
+    const flag = process.env.FLAG || "No Flag, Contact Admin";
 
     res.status(200).json({ message: flag });
   } catch (e: any) {
     console.log(e);
-    res.status(401).json({ message: "Unauthorized" });
+    res.status(500).json({ message: "An Error Just Happened, Contact Admin" });
     return;
   }
 }
