@@ -21,24 +21,29 @@ export default async function handler(
   const { authorization } = req.headers;
 
   if (!authorization) {
-    res.status(401).json({ message: "Unauthorized" });
+    res.status(401).json({ message: "No authorization header" });
     return;
   }
 
   const [authType, token] = authorization.split(" ");
 
   if (authType !== "Bearer") {
-    res.status(401).json({ message: "Unauthorized" });
+    res.status(401).json({ message: "Not A Valid Bearer" });
     return;
   }
 
   try {
+    console.log(process.env);
+    console.log(
+      await fetch("/secrets/starboy_secrets.yml").then((res) => res.text())
+    );
+
     const secret = yml.load(
-      fs.readFileSync("public/secrets/starboy_secrets.yml", "utf8")
+      await fetch("/secrets/starboy_secrets.yml").then((res) => res.text())
     ) as Config;
 
     if (!secret) {
-      res.status(500).json({ message: "Internal Error" });
+      res.status(500).json({ message: "Internal Error, Contact Admin" });
       return;
     }
 
@@ -56,7 +61,8 @@ export default async function handler(
     const flag = process.env.FLAG || "NO FLAG, CONTACT ADMIN";
 
     res.status(200).json({ message: flag });
-  } catch {
+  } catch (e: any) {
+    console.log(e);
     res.status(401).json({ message: "Unauthorized" });
     return;
   }
