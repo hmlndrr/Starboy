@@ -32,6 +32,11 @@ export default async function handler(
     return;
   }
 
+  if (!token) {
+    res.status(401).json({ message: "Not A Valid Token" });
+    return;
+  }
+
   try {
     const url = process.env.ME || "http://localhost:3000";
     const secret = yml.load(
